@@ -3,11 +3,12 @@ import cursor
 
 class Sheet:
 	def __init__(self, filename):
-		self.file = open(filename)
+		self.file = open('test.csv')
 		self.sheet = []
 
 		# Parse text file into 2D array
 		for line in self.file.readlines():
+			line = line[:-1]
 			row = []
 			for val in line.split(','):
 				row.append(val)
@@ -53,7 +54,8 @@ class Sheet:
 			colpos = 0
 			for col in range(len(self.sheet[row])):
 				text = self.sheet[row][col]
-				text += ' ' * (colwidth[col] - len(text))
+				text += ' ' * (colwidth[col] - len(text)) # pad cell with extra spaces
+
 				if (row, col) == self.cursor.getPos():
 					screen.addstr(row, colpos, text, curses.color_pair(1))
 				else:
@@ -71,6 +73,6 @@ class Sheet:
 	def maxCol(self):
 		return len(self.sheet[0]) - 1
 
-s = Sheet(input("Filename: "))
+s = Sheet(input(""))
 curses.wrapper(s.main)
 
