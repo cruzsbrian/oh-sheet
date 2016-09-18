@@ -2,7 +2,7 @@ import curses
 import cursor
 
 class Sheet:
-	def __init__(self, filename):
+	def __init__(self):
 		self.file = open('test.csv')
 		self.sheet = []
 
@@ -62,7 +62,7 @@ class Sheet:
 					screen.addstr(row, colpos, text)
 				colpos += colwidth[col] # increment column by needed width
 
-		self.cursor.printPos(screen)
+		self.cursor.printStatus(screen)
 
 	def quit(self):
 		self.running = False
@@ -73,6 +73,6 @@ class Sheet:
 	def maxCol(self):
 		return len(self.sheet[0]) - 1
 
-s = Sheet(input(""))
+s = Sheet()
 curses.wrapper(s.main)
 
