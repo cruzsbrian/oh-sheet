@@ -1,4 +1,5 @@
 import curses
+import cursor
 
 class Sheet:
 	def __init__(self, filename):
@@ -21,13 +22,22 @@ class Sheet:
 			if len(row) < maxLen:
 				row += [' '] * (maxLen - len(row))
 
+		# Set up the cursor
+		self.cursor = cursor.Cursor(self)
+
+		self.running = True
+
 	def main(self, screen):
 		curses.curs_set(0)
 
-		screen.clear()
-		self.display(screen)
-		screen.refresh()
-		screen.getch()
+		curses.start_color()
+		curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+
+		while self.running:
+			screen.clear()
+			self.display(screen)
+			screen.refresh()
+			self.cursor.key(screen.getch())
 
 	def display(self, screen):
 		# Find needed max width for each column
@@ -42,8 +52,24 @@ class Sheet:
 		for row in range(len(self.sheet)):
 			colpos = 0
 			for col in range(len(self.sheet[row])):
-				screen.addstr(row, colpos, self.sheet[row][col])
+				text = self.sheet[row][col]
+				text += ' ' * (colwidth[col] - len(text))
+				if (row, col) == self.cursor.getPos():
+					screen.addstr(row, colpos, text, curses.color_pair(1))
+				else:
+					screen.addstr(row, colpos, text)
 				colpos += colwidth[col] # increment column by needed width
+
+		self.cursor.printPos(screen)
+
+	def quit(self):
+		self.running = False
+
+	def maxRow(self):
+		return len(self.sheet) - 1
+
+	def maxCol(self):
+		return len(self.sheet[0]) - 1
 
 s = Sheet(input("Filename: "))
 curses.wrapper(s.main)
