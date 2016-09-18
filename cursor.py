@@ -35,8 +35,8 @@ class Cursor:
 				self.sheet.quit()
 
 	def printPos(self, screen):
-		rowStr = chr(self.row + 65)
-		colStr = str(self.col)
+		rowStr = str(self.row)
+		colStr = chr(self.col + 65)
 		screenHeight, screenWidth = screen.getmaxyx()
 
 		text = rowStr + colStr
