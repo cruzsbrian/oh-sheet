@@ -73,7 +73,7 @@ class Cursor:
 		colStr = posString[m.start():]
 
 		self.row = int(rowStr)
-		self.col = ord(colStr) - 65
+		self.col = ord(colStr.upper()) - 65
 
 		self.mode = MODE_NORMAL
 
