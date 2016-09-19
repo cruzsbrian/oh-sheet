@@ -31,6 +31,7 @@ class Sheet:
 	def main(self, screen):
 		curses.curs_set(0)
 
+		# colors to highlight cursor cell
 		curses.start_color()
 		curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
 

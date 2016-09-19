@@ -37,6 +37,9 @@ class Cursor:
 			elif k == ord('g'):
 				self.mode = MODE_GOTO
 
+			elif k == ord('i'):
+				self.mode = MODE_INSERT
+
 			elif k == ord('q'):
 				self.sheet.quit()
 
@@ -55,6 +58,19 @@ class Cursor:
 
 			else:
 				self.command += chr(k)
+
+
+		elif self.mode == MODE_INSERT:
+			if k == ord('\n') or k == 27: # enter or escape
+				self.mode = MODE_NORMAL
+
+			elif k == 127: # backspace
+				value = self.sheet.sheet[self.row][self.col]
+				self.sheet.sheet[self.row][self.col] = value[:-1] 
+
+			else:
+				self.sheet.sheet[self.row][self.col] += chr(k)
+
 
 		elif self.mode == MODE_ERROR:
 			self.mode = MODE_NORMAL # set back to normal after keystroke
