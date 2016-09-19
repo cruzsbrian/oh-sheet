@@ -38,7 +38,6 @@ class Sheet:
 			screen.clear()
 			self.display(screen)
 			screen.refresh()
-
 			self.cursor.key(screen.getch())
 
 	def display(self, screen):
