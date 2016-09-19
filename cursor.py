@@ -5,12 +5,14 @@ MODE_NORMAL = 0
 MODE_INSERT = 1
 MODE_VISUAL = 2
 MODE_GOTO = 3
+MODE_ERROR = 4
 
 class Cursor:
 	def __init__(self, sheet):
 		self.sheet = sheet
 		self.mode = MODE_NORMAL
 		self.command = ''
+		self.message = ''
 		self.row = 0
 		self.col = 0
 
@@ -43,7 +45,6 @@ class Cursor:
 			if k == ord('\n'): # enter
 				self.goto(self.command)
 				self.command = ''
-				self.mode = MODE_NORMAL
 
 			elif k == 27: # escape
 				self.command = ''
@@ -55,7 +56,17 @@ class Cursor:
 			else:
 				self.command += chr(k)
 
+		elif self.mode == MODE_ERROR:
+			self.mode = MODE_NORMAL # set back to normal after keystroke
+
 	def goto(self, posString):
+		# Input validation
+		m = re.search('\d+[a-zA-Z]+', posString)
+		if (m == None):
+			self.message = 'Invalid input'
+			self.mode = MODE_ERROR
+			return
+
 		# Split into row and col portion
 		m = re.search('[a-zA-Z]', posString) # find first letter
 		rowStr = posString[:m.start()]
@@ -63,6 +74,8 @@ class Cursor:
 
 		self.row = int(rowStr)
 		self.col = ord(colStr) - 65
+
+		self.mode = MODE_NORMAL
 
 	def printStatus(self, screen):
 		screenHeight, screenWidth = screen.getmaxyx()
@@ -80,6 +93,9 @@ class Cursor:
 
 		elif self.mode == MODE_GOTO:
 			modeText = 'GOTO ' + self.command
+
+		elif self.mode == MODE_ERROR:
+			modeText = self.message;
 
 		screen.addstr(screenHeight - 1, 0, modeText)
 
