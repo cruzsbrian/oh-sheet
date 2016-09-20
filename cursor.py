@@ -5,7 +5,6 @@ MODE_NORMAL = 0
 MODE_INSERT = 1
 MODE_VISUAL = 2
 MODE_GOTO = 3
-MODE_ERROR = 4
 
 class Cursor:
 	def __init__(self, sheet):
@@ -18,6 +17,8 @@ class Cursor:
 
 	def key(self, k):
 		if self.mode == MODE_NORMAL:
+			self.message = ''
+
 			if k == ord('h'):
 				if self.col > 0:
 					self.col -= 1
@@ -39,6 +40,14 @@ class Cursor:
 
 			elif k == ord('i'):
 				self.mode = MODE_INSERT
+
+			elif k == ord('w'):
+				try:
+					self.sheet.write()
+				except:
+					self.message = 'Error writing file'
+				else:
+					self.message = 'Wrote file'
 
 			elif k == ord('q'):
 				self.sheet.quit()
@@ -72,15 +81,12 @@ class Cursor:
 				self.sheet.sheet[self.row][self.col] += chr(k)
 
 
-		elif self.mode == MODE_ERROR:
-			self.mode = MODE_NORMAL # set back to normal after keystroke
-
 	def goto(self, posString):
 		# Input validation
 		m = re.search('\d+[a-zA-Z]+', posString)
 		if (m == None):
 			self.message = 'Invalid input'
-			self.mode = MODE_ERROR
+			self.mode = MODE_NORMAL
 			return
 
 		# Split into row and col portion
@@ -99,7 +105,10 @@ class Cursor:
 		# Print mode/command
 		modeText = ''
 		if self.mode == MODE_NORMAL:
-			modeText = 'NORMAL'
+			if self.message == '':
+				modeText = 'NORMAL'
+			else:
+				modeText = self.message
 
 		elif self.mode == MODE_INSERT:
 			modeText = 'INSERT'
@@ -109,9 +118,6 @@ class Cursor:
 
 		elif self.mode == MODE_GOTO:
 			modeText = 'GOTO ' + self.command
-
-		elif self.mode == MODE_ERROR:
-			modeText = self.message;
 
 		screen.addstr(screenHeight - 1, 0, modeText)
 

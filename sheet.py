@@ -14,6 +14,10 @@ class Sheet:
 				row.append(val)
 			self.sheet.append(row)
 
+		# Check for empty file
+		if self.sheet == []:
+			self.sheet = [[]]
+
 		# Ensure all rows are same number of cells
 		maxLen = 0
 		for row in self.sheet:
@@ -65,6 +69,12 @@ class Sheet:
 				colpos += colwidth[col] # increment column by needed width
 
 		self.cursor.printStatus(screen)
+
+	def write(self):
+		sheetfile = open('output.csv', 'w')
+		for row in self.sheet:
+			sheetfile.write(','.join(row) + '\n')
+		sheetfile.close()
 
 	def quit(self):
 		self.running = False
