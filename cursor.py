@@ -75,7 +75,7 @@ class Cursor:
 
 			elif k == 127: # backspace
 				value = self.sheet.sheet[self.row][self.col]
-				self.sheet.sheet[self.row][self.col] = value[:-1] 
+				self.sheet.sheet[self.row][self.col] = value[:-1]
 
 			else:
 				self.sheet.sheet[self.row][self.col] += chr(k)
@@ -89,13 +89,7 @@ class Cursor:
 			self.mode = MODE_NORMAL
 			return
 
-		# Split into row and col portion
-		m = re.search('[a-zA-Z]', posString) # find first letter
-		rowStr = posString[:m.start()]
-		colStr = posString[m.start():]
-
-		self.row = int(rowStr)
-		self.col = ord(colStr.upper()) - 65
+		self.row, self.col = cellFromCode(posString.upper())
 
 		self.mode = MODE_NORMAL
 
@@ -121,13 +115,36 @@ class Cursor:
 
 		screen.addstr(screenHeight - 1, 0, modeText)
 
-		# Print position
-		rowStr = str(self.row)
-		colStr = chr(self.col + 65)
-
-		posText = rowStr + colStr
+		posText = codeFromCell(self.row, self.col)
 		screen.addstr(screenHeight - 1, screenWidth - len(posText) - 1, posText)
 
 	def getPos(self):
 		return self.row, self.col
+
+
+def cellFromCode(code):
+	m = re.search('[a-zA-Z]', code)
+	rowStr = code[:m.start()]
+	colStr = code[m.start():]
+
+	colStr = colStr[::-1]
+	col = 0
+	for i in range(len(colStr)):
+		digit = ord(colStr[i]) - 64
+		col += digit * 26 ** i
+	col -= 1
+
+	row = int(rowStr)
+
+	return row, col
+
+def codeFromCell(row, col):
+	col += 1
+	colStr = ''
+	while col > 0:
+		digit = col % 26
+		col //= 26
+		colStr = chr(digit + 64) + colStr
+
+	return str(row) + colStr
 

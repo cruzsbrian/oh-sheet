@@ -85,6 +85,7 @@ class Sheet:
 	def maxCol(self):
 		return len(self.sheet[0]) - 1
 
+
 s = Sheet()
 curses.wrapper(s.main)
 
