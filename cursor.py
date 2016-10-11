@@ -141,8 +141,10 @@ def cellFromCode(code):
 	return row, col
 
 def codeFromCell(row, col):
-	col += 1
 	colStr = ''
+	digit = col % 26
+	col //= 26
+	colStr = chr(digit + 65) + colStr
 	while col > 0:
 		digit = col % 26
 		col //= 26
