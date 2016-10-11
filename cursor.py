@@ -24,16 +24,18 @@ class Cursor:
 					self.col -= 1
 
 			elif k == ord('j'):
+				self.row += 1
 				if self.row < self.sheet.maxRow():
-					self.row += 1
+					self.sheet.addRow(1)
 
 			elif k == ord('k'):
 				if self.row > 0:
 					self.row -= 1
 
 			elif k == ord('l'):
+				self.col += 1
 				if self.col < self.sheet.maxCol():
-					self.col += 1
+					self.sheet.addCol(1)
 
 			elif k == ord('g'):
 				self.mode = MODE_GOTO

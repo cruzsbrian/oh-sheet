@@ -25,7 +25,7 @@ class Sheet:
 				maxLen = len(row)
 		for row in self.sheet:
 			if len(row) < maxLen:
-				row += [' '] * (maxLen - len(row))
+				row += [''] * (maxLen - len(row))
 
 		# Set up the cursor
 		self.cursor = cursor.Cursor(self)
@@ -72,18 +72,49 @@ class Sheet:
 
 	def write(self):
 		sheetfile = open('output.csv', 'w')
-		for row in self.sheet:
-			sheetfile.write(','.join(row) + '\n')
+
+		mr = self.maxWrittenRow() + 1
+		mc = self.maxWrittenCol() + 1
+		for row in range(mr):
+			writerow = self.sheet[row][:mc]
+			sheetfile.write(','.join(writerow) + '\n')
 		sheetfile.close()
 
 	def quit(self):
 		self.running = False
+
+	def addRow(self, n):
+		cols = len(self.sheet[0])
+		for i in range(n):
+			self.sheet.append([''] * cols)
+
+	def addCol(self, n):
+		for row in self.sheet:
+			row += [''] * n
 
 	def maxRow(self):
 		return len(self.sheet) - 1
 
 	def maxCol(self):
 		return len(self.sheet[0]) - 1
+
+	def maxWrittenRow(self):
+		row = 0
+		for i in range(len(self.sheet)):
+			for cell in self.sheet[i]:
+				if cell != '':
+					row = i
+
+		return row
+
+	def maxWrittenCol(self):
+		col = 0
+		for row in self.sheet:
+			for i in range(len(row)):
+				if row[i] != '' and i > col:
+					col = i
+
+		return col
 
 
 s = Sheet()
