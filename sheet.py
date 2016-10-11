@@ -1,5 +1,6 @@
 import curses
 import cursor
+import calc
 
 class Sheet:
 	def __init__(self):
@@ -34,6 +35,7 @@ class Sheet:
 
 	def main(self, screen):
 		curses.curs_set(0)
+		self.height, self.width = screen.getmaxyx()
 
 		# colors to highlight cursor cell
 		curses.start_color()
@@ -60,12 +62,19 @@ class Sheet:
 			colpos = 0
 			for col in range(len(self.sheet[row])):
 				text = self.sheet[row][col]
+
+				# Calculations if necessary
+				if len(text) > 0 and text[0] == '=' and (row, col) != self.cursor.getPos():
+					text = calc.calc(text[1:])
+
 				text += ' ' * (colwidth[col] - len(text)) # pad cell with extra spaces
 
-				if (row, col) == self.cursor.getPos():
-					screen.addstr(row, colpos, text, curses.color_pair(1))
-				else:
-					screen.addstr(row, colpos, text)
+				if row < self.height and colpos + len(text) < self.width:
+					if (row, col) == self.cursor.getPos():
+						screen.addstr(row, colpos, text, curses.color_pair(1))
+					else:
+						screen.addstr(row, colpos, text)
+
 				colpos += colwidth[col] # increment column by needed width
 
 		self.cursor.printStatus(screen)

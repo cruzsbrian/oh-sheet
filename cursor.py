@@ -25,7 +25,7 @@ class Cursor:
 
 			elif k == ord('j'):
 				self.row += 1
-				if self.row < self.sheet.maxRow():
+				if self.row > self.sheet.maxRow():
 					self.sheet.addRow(1)
 
 			elif k == ord('k'):
@@ -34,7 +34,7 @@ class Cursor:
 
 			elif k == ord('l'):
 				self.col += 1
-				if self.col < self.sheet.maxCol():
+				if self.col > self.sheet.maxCol():
 					self.sheet.addCol(1)
 
 			elif k == ord('g'):
