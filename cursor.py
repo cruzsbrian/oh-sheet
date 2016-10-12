@@ -86,7 +86,7 @@ class Cursor:
 	def goto(self, posString):
 		# Input validation
 		m = re.search('\d+[a-zA-Z]+', posString)
-		if (m == None):
+		if m == None:
 			self.message = 'Invalid input'
 			self.mode = MODE_NORMAL
 			return

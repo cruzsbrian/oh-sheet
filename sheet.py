@@ -94,14 +94,21 @@ class Sheet:
 
 		# Calculations if necessary
 		if len(text) > 0 and text[0] == '=' and (row, col) != self.cursor.getPos():
+			# input validation
+			# regex: '=', <either number or cell code><operator> any number of times, <either number or cell code>
+			m = re.search('^=((-?\d*.?\d+|\d+[a-zA-Z]+)[\+\-\*\/\^])*(-?\d*.?\d+|\d+[a-zA-Z]+)$', text)
+			if m == None:
+				return 'ERR'
+
 			text = text[1:]
 
 			# handle cell references
+			# go through backwards so that the index of the next match is unchanged by replacing the first one
 			cellRefs = list(re.finditer('\d+[a-zA-Z]+', text))[::-1]
 			for m in cellRefs:
 				code = text[m.start():m.end()]
 				cellRow, cellCol = cursor.cellFromCode(code)
-				val = self.getText(cellRow, cellCol)
+				val = self.getText(cellRow, cellCol) # recursion!
 				text = text[:m.start()] + str(val) + text[m.end():]
 
 			text = calc.calc(text)
