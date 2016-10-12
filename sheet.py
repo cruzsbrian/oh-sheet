@@ -1,3 +1,4 @@
+import re
 import curses
 import cursor
 import calc
@@ -53,7 +54,8 @@ class Sheet:
 		colwidth = [4] * len(self.sheet[0])
 		for row in range(len(self.sheet)):
 			for col in range(len(self.sheet[row])):
-				length = len(self.sheet[row][col]) + 1
+				text = self.getText(row, col)
+				length = len(text) + 1
 				if length > colwidth[col]:
 					colwidth[col] = length
 
@@ -61,12 +63,7 @@ class Sheet:
 		for row in range(len(self.sheet)):
 			colpos = 0
 			for col in range(len(self.sheet[row])):
-				text = self.sheet[row][col]
-
-				# Calculations if necessary
-				if len(text) > 0 and text[0] == '=' and (row, col) != self.cursor.getPos():
-					text = calc.calc(text[1:])
-
+				text = self.getText(row, col)
 				text += ' ' * (colwidth[col] - len(text)) # pad cell with extra spaces
 
 				if row < self.height and colpos + len(text) < self.width:
@@ -91,6 +88,25 @@ class Sheet:
 
 	def quit(self):
 		self.running = False
+
+	def getText(self, row, col):
+		text = self.sheet[row][col]
+
+		# Calculations if necessary
+		if len(text) > 0 and text[0] == '=' and (row, col) != self.cursor.getPos():
+			text = text[1:]
+
+			# handle cell references
+			cellRefs = list(re.finditer('\d+[a-zA-Z]+', text))[::-1]
+			for m in cellRefs:
+				code = text[m.start():m.end()]
+				cellRow, cellCol = cursor.cellFromCode(code)
+				val = self.getText(cellRow, cellCol)
+				text = text[:m.start()] + str(val) + text[m.end():]
+
+			text = calc.calc(text)
+
+		return text
 
 	def addRow(self, n):
 		cols = len(self.sheet[0])

@@ -91,7 +91,7 @@ class Cursor:
 			self.mode = MODE_NORMAL
 			return
 
-		self.row, self.col = cellFromCode(posString.upper())
+		self.row, self.col = cellFromCode(posString)
 
 		self.mode = MODE_NORMAL
 
@@ -125,6 +125,7 @@ class Cursor:
 
 
 def cellFromCode(code):
+	code = code.upper()
 	m = re.search('[a-zA-Z]', code)
 	rowStr = code[:m.start()]
 	colStr = code[m.start():]
