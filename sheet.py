@@ -18,7 +18,7 @@ class Sheet:
 
 		# Check for empty file
 		if self.sheet == []:
-			self.sheet = [[]]
+			self.sheet = [['']]
 
 		# Ensure all rows are same number of cells
 		maxLen = 0
@@ -93,10 +93,10 @@ class Sheet:
 		text = self.sheet[row][col]
 
 		# Calculations if necessary
-		if len(text) > 0 and text[0] == '=' and (row, col) != self.cursor.getPos():
+		if len(text) > 0 and text[0] == '=' and ((row, col) != self.cursor.getPos() or self.cursor.mode != cursor.MODE_INSERT):
 			# input validation
-			# regex: '=', <either number or cell code><operator> any number of times, <either number or cell code>
-			m = re.search('^=((-?\d*.?\d+|\d+[a-zA-Z]+)[\+\-\*\/\^])*(-?\d*.?\d+|\d+[a-zA-Z]+)$', text)
+			# regex: '=', <any number of '('><either number or cell code><operator><any number of )> any number of times, <either number or cell code><any number of )>
+			m = re.search('^=(\(*(-?\d*.?\d+|\d+[a-zA-Z]+)\)*[\+\-\*\/\^])*(-?\d*.?\d+|\d+[a-zA-Z]+)\)*$', text)
 			if m == None:
 				return 'ERR'
 

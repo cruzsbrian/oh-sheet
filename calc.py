@@ -5,7 +5,7 @@ def calc(exp):
 		exp = splitstring(exp)
 		exp = parse(exp)
 		val = evaluate(exp)
-		return str(val)
+		return str(round(val, 3))
 	except:
 		return 'ERR'
 
