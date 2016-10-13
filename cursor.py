@@ -14,6 +14,7 @@ class Cursor:
 		self.message = ''
 		self.row = 0
 		self.col = 0
+		self.cellPos = 0
 
 	def key(self, k):
 		if self.mode == MODE_NORMAL:
@@ -41,6 +42,11 @@ class Cursor:
 				self.mode = MODE_GOTO
 
 			elif k == ord('i'):
+				self.cellPos = len(self.sheet.sheet[self.row][self.col])
+				self.mode = MODE_INSERT
+
+			elif k == ord('r'):
+				self.sheet.sheet[self.row][self.col] = ''
 				self.mode = MODE_INSERT
 
 			elif k == ord('w'):
@@ -73,6 +79,7 @@ class Cursor:
 
 		elif self.mode == MODE_INSERT:
 			if k == ord('\n') or k == 27: # enter or escape
+				self.cellPos = 0
 				self.mode = MODE_NORMAL
 
 			elif k == 127: # backspace
