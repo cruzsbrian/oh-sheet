@@ -4,14 +4,20 @@ import re
 MODE_NORMAL = 0
 MODE_INSERT = 1
 MODE_VISUAL = 2
-MODE_GOTO = 3
+MODE_COMMAND = 3
+
+COMM_NONE = 0
+COMM_GOTO = 1
+COMM_WRITE = 2
 
 class Cursor:
 	def __init__(self, sheet):
 		self.sheet = sheet
 		self.mode = MODE_NORMAL
-		self.command = ''
+		self.command = COMM_NONE
 		self.message = ''
+		self.input = ''
+		self.inputPos = 0
 		self.row = 0
 		self.col = 0
 		self.cellPos = 0
@@ -21,6 +27,10 @@ class Cursor:
 		if self.mode == MODE_NORMAL:
 			self.message = ''
 
+			self.command = COMM_NONE
+			self.input = ''
+
+			# Key inputs
 			if k == ord('h'):
 				if self.col > 0:
 					self.col -= 1
@@ -40,7 +50,9 @@ class Cursor:
 					self.sheet.addCol(1)
 
 			elif k == ord('g'):
-				self.mode = MODE_GOTO
+				self.command = COMM_GOTO
+				self.message = 'GOTO '
+				self.mode = MODE_COMMAND
 
 			elif k == ord('i'):
 				self.cellPos = len(self.sheet.sheet[self.row][self.col])
@@ -51,12 +63,18 @@ class Cursor:
 				self.mode = MODE_INSERT
 
 			elif k == ord('w'):
-				try:
-					self.sheet.write()
-				except:
-					self.message = 'Error writing file'
+				if self.sheet.filename == '':
+					self.message = 'Enter a filename: '
+					self.command = COMM_WRITE
+					self.mode = MODE_COMMAND
 				else:
-					self.message = 'Wrote file'
+					try:
+						self.sheet.write()
+					except:
+						self.message = 'Error writing file'
+					else:
+						self.message = 'Wrote file'
+						self.modified = False
 
 			elif k == ord('q'):
 				if self.modified:
@@ -66,20 +84,33 @@ class Cursor:
 					self.sheet.quit()
 
 
-		elif self.mode == MODE_GOTO:
+		elif self.mode == MODE_COMMAND:
 			if k == ord('\n'): # enter
-				self.goto(self.command)
-				self.command = ''
+				if self.command == COMM_GOTO:
+					self.goto(self.input)
+
+				elif self.command == COMM_WRITE:
+					self.sheet.filename = self.input
+
+					try:
+						self.sheet.write()
+					except:
+						self.message = 'Error writing file'
+					else:
+						self.message = 'Wrote file'
+						self.modified = False
+
+				self.mode = MODE_NORMAL
 
 			elif k == 27: # escape
-				self.command = ''
+				self.input = ''
 				self.mode = MODE_NORMAL
 
 			elif k == 127: # backspace
-				self.command = self.command[:-1]
+				self.input = self.input[:-1]
 
 			else:
-				self.command += chr(k)
+				self.input += chr(k)
 
 
 		elif self.mode == MODE_INSERT:
@@ -138,10 +169,14 @@ class Cursor:
 		elif self.mode == MODE_VISUAL:
 			modeText = 'VISUAL'
 
-		elif self.mode == MODE_GOTO:
-			modeText = 'GOTO ' + self.command
+		elif self.mode == MODE_COMMAND:
+			modeText = self.message + self.input
 
-		screen.addstr(screenHeight - 1, 0, '[' + self.sheet.filename + '] ' + modeText)
+		filename = self.sheet.filename
+		if filename == '':
+			filename = 'New File'
+
+		screen.addstr(screenHeight - 1, 0, '[' + filename + '] ' + modeText)
 
 		posText = codeFromCell(self.row, self.col)
 		screen.addstr(screenHeight - 1, screenWidth - len(posText) - 1, posText)

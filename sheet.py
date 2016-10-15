@@ -1,21 +1,25 @@
 import re
+import sys
 import curses
 import cursor
 import calc
 
 class Sheet:
 	def __init__(self):
-		self.filename = 'test.csv'
-		self.file = open(self.filename)
 		self.sheet = []
+		self.filename = ''
 
-		# Parse text file into 2D array
-		for line in self.file.readlines():
-			line = line[:-1]
-			row = []
-			for val in line.split(','):
-				row.append(val)
-			self.sheet.append(row)
+		if len(sys.argv) > 1:
+			self.filename = sys.argv[1]
+			self.file = open(self.filename)
+
+			# Parse text file into 2D array
+			for line in self.file.readlines():
+				line = line[:-1]
+				row = []
+				for val in line.split(','):
+					row.append(val)
+				self.sheet.append(row)
 
 		# Check for empty file
 		if self.sheet == []:
@@ -83,7 +87,7 @@ class Sheet:
 		self.cursor.printStatus(screen)
 
 	def write(self):
-		sheetfile = open('output.csv', 'w')
+		sheetfile = open(self.filename, 'w')
 
 		mr = self.maxWrittenRow() + 1
 		mc = self.maxWrittenCol() + 1
