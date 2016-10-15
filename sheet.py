@@ -68,7 +68,11 @@ class Sheet:
 
 				if row < self.height and colpos + len(text) < self.width:
 					if (row, col) == self.cursor.getPos():
-						screen.addstr(row, colpos, text, curses.color_pair(1))
+						if self.cursor.mode == cursor.MODE_INSERT:
+							screen.addstr(row, colpos, text)
+							screen.addstr(row, colpos + self.cursor.cellPos, text[self.cursor.cellPos], curses.color_pair(1))
+						else:
+							screen.addstr(row, colpos, text, curses.color_pair(1))
 					else:
 						screen.addstr(row, colpos, text)
 

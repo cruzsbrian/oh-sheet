@@ -78,16 +78,28 @@ class Cursor:
 
 
 		elif self.mode == MODE_INSERT:
+			value = self.sheet.sheet[self.row][self.col]
+
 			if k == ord('\n') or k == 27: # enter or escape
 				self.cellPos = 0
 				self.mode = MODE_NORMAL
 
 			elif k == 127: # backspace
-				value = self.sheet.sheet[self.row][self.col]
-				self.sheet.sheet[self.row][self.col] = value[:-1]
+				if self.cellPos > 0:
+					self.sheet.sheet[self.row][self.col] = value[:self.cellPos - 1] + value[self.cellPos:]
+					self.cellPos -= 1
+
+			elif k == curses.KEY_LEFT:
+				if self.cellPos > 0:
+					self.cellPos -= 1
+
+			elif k == curses.KEY_RIGHT:
+				if self.cellPos < len(value):
+					self.cellPos += 1
 
 			else:
-				self.sheet.sheet[self.row][self.col] += chr(k)
+				self.sheet.sheet[self.row][self.col] = value[:self.cellPos] + chr(k) + value[self.cellPos:]
+				self.cellPos += 1
 
 
 	def goto(self, posString):
