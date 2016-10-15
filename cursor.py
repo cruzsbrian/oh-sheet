@@ -15,6 +15,7 @@ class Cursor:
 		self.row = 0
 		self.col = 0
 		self.cellPos = 0
+		self.modified = False
 
 	def key(self, k):
 		if self.mode == MODE_NORMAL:
@@ -58,7 +59,11 @@ class Cursor:
 					self.message = 'Wrote file'
 
 			elif k == ord('q'):
-				self.sheet.quit()
+				if self.modified:
+					self.message = 'Unsaved changes: press q again to quit without saving, or w to save'
+					self.modified = False
+				else:
+					self.sheet.quit()
 
 
 		elif self.mode == MODE_GOTO:
@@ -88,6 +93,7 @@ class Cursor:
 				if self.cellPos > 0:
 					self.sheet.sheet[self.row][self.col] = value[:self.cellPos - 1] + value[self.cellPos:]
 					self.cellPos -= 1
+					self.modified = True
 
 			elif k == curses.KEY_LEFT:
 				if self.cellPos > 0:
@@ -100,6 +106,7 @@ class Cursor:
 			else:
 				self.sheet.sheet[self.row][self.col] = value[:self.cellPos] + chr(k) + value[self.cellPos:]
 				self.cellPos += 1
+				self.modified = True
 
 
 	def goto(self, posString):
@@ -134,7 +141,7 @@ class Cursor:
 		elif self.mode == MODE_GOTO:
 			modeText = 'GOTO ' + self.command
 
-		screen.addstr(screenHeight - 1, 0, modeText)
+		screen.addstr(screenHeight - 1, 0, '[' + self.sheet.filename + '] ' + modeText)
 
 		posText = codeFromCell(self.row, self.col)
 		screen.addstr(screenHeight - 1, screenWidth - len(posText) - 1, posText)

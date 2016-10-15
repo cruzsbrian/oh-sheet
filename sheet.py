@@ -5,7 +5,8 @@ import calc
 
 class Sheet:
 	def __init__(self):
-		self.file = open('test.csv')
+		self.filename = 'test.csv'
+		self.file = open(self.filename)
 		self.sheet = []
 
 		# Parse text file into 2D array
@@ -54,7 +55,8 @@ class Sheet:
 		colwidth = [4] * len(self.sheet[0])
 		for row in range(len(self.sheet)):
 			for col in range(len(self.sheet[row])):
-				text = self.getText(row, col)
+				text = self.getDisplayText(row, col)
+
 				length = len(text) + 1
 				if length > colwidth[col]:
 					colwidth[col] = length
@@ -63,7 +65,7 @@ class Sheet:
 		for row in range(len(self.sheet)):
 			colpos = 0
 			for col in range(len(self.sheet[row])):
-				text = self.getText(row, col)
+				text = self.getDisplayText(row, col)
 				text += ' ' * (colwidth[col] - len(text)) # pad cell with extra spaces
 
 				if row < self.height and colpos + len(text) < self.width:
@@ -93,11 +95,11 @@ class Sheet:
 	def quit(self):
 		self.running = False
 
-	def getText(self, row, col):
+	def getCalcText(self, row, col):
 		text = self.sheet[row][col]
 
 		# Calculations if necessary
-		if len(text) > 0 and text[0] == '=' and ((row, col) != self.cursor.getPos() or self.cursor.mode != cursor.MODE_INSERT):
+		if len(text) > 0 and text[0] == '=':
 			# input validation
 			# regex: '=', <any number of '('><either number or cell code><operator><any number of )> any number of times, <either number or cell code><any number of )>
 			m = re.search('^=(\(*(-?\d*.?\d+|\d+[a-zA-Z]+)\)*[\+\-\*\/\^])*(-?\d*.?\d+|\d+[a-zA-Z]+)\)*$', text)
@@ -112,12 +114,18 @@ class Sheet:
 			for m in cellRefs:
 				code = text[m.start():m.end()]
 				cellRow, cellCol = cursor.cellFromCode(code)
-				val = self.getText(cellRow, cellCol) # recursion!
+				val = self.getCalcText(cellRow, cellCol) # recursion!
 				text = text[:m.start()] + str(val) + text[m.end():]
 
 			text = calc.calc(text)
 
 		return text
+
+	def getDisplayText(self, row, col):
+		if (row, col) == self.cursor.getPos() and self.cursor.mode == cursor.MODE_INSERT:
+			return self.sheet[row][col]
+		else:
+			return self.getCalcText(row, col)
 
 	def addRow(self, n):
 		cols = len(self.sheet[0])
