@@ -1,4 +1,7 @@
 /__pycache__/
+/build/
+/dist/
+/ohsheet.egg-info/
 
 # Testing files
 test.csv
