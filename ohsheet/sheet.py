@@ -1,8 +1,8 @@
 import re
 import sys
 import curses
-import cursor
-import calc
+from ohsheet import cursor
+from ohsheet import calc
 
 class Sheet:
 	def __init__(self):
@@ -164,7 +164,7 @@ class Sheet:
 
 		return col
 
-
-s = Sheet()
-curses.wrapper(s.main)
+def main():
+	s = Sheet()
+	curses.wrapper(s.main)
 

@@ -1,0 +1,3 @@
+[console_scripts]
+ohsheet = ohsheet.sheet:main
+
