@@ -105,7 +105,7 @@ class Sheet:
 		# Calculations if necessary
 		if len(text) > 0 and text[0] == '=':
 			# input validation
-			# regex: '=', <any number of '('><either number or cell code><operator><any number of )> any number of times, <either number or cell code><any number of )>
+			# regex: =, <any number of (> <either number or cell code> <any number of )> <operator> any number of times, <either number or cell code> <any number of )>
 			m = re.search('^=(\(*(-?\d*.?\d+|\d+[a-zA-Z]+)\)*[\+\-\*\/\^])*(-?\d*.?\d+|\d+[a-zA-Z]+)\)*$', text)
 			if m == None:
 				return 'ERR'
