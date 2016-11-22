@@ -14,7 +14,7 @@ Press `g` to go to a cell by its code.
 
 Press `i` to edit a cell or `r` to replace its contents.
 
-When editing, you can use arrow keys to move the cursor withing the cell's text.
+When editing, you can use arrow keys to move the cursor within the cell's text.
 
 To use formulas, begin the cell with `=` and write expressions with no whitespace. Cell references are case-insensitive.
 
